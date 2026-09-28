@@ -1,3 +1,4 @@
+#include "focus.h"
 #include "frog.h"
 #include "status.h"
 
@@ -167,6 +168,7 @@ int main(int argc, char** argv) {
     for (auto& a : agents) lastState[a.name] = a.state;
     double lastPoll = glfwGetTime();
     bool onTop = false;
+    std::string menuAgent;  // whose frog was right-clicked
     int frame = 0;
 
     while (!glfwWindowShouldClose(win)) {
@@ -260,7 +262,11 @@ int main(int argc, char** argv) {
 
                 ImGui::SetCursorScreenPos(cell);
                 ImGui::InvisibleButton(a.name.c_str(), {kCellW * scale, kCellH * scale});
-                if (ImGui::IsItemHovered()) {
+                if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+                    menuAgent = a.name;
+                    ImGui::OpenPopup("frog");
+                }
+                if (ImGui::IsItemHovered() && !ImGui::IsPopupOpen("frog")) {
                     ImGui::BeginTooltip();
                     ImGui::PushTextWrapPos(ImGui::GetFontSize() * 24);
                     ImGui::TextUnformatted(a.name.c_str());
@@ -275,7 +281,21 @@ int main(int argc, char** argv) {
             }
         }
 
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::OpenPopup("menu");
+        if (ImGui::BeginPopup("frog")) {
+            auto it = std::find_if(agents.begin(), agents.end(), [&](const Agent& a) { return a.name == menuAgent; });
+            if (it == agents.end()) {
+                ImGui::CloseCurrentPopup();
+            } else {
+                ImGui::TextDisabled("%s", it->name.c_str());
+                ImGui::Separator();
+                if (ImGui::MenuItem("Show in terminal")) focusAgent(*it);
+                if (ImGui::MenuItem("Open in Claude Desktop", nullptr, false, !it->bridgeSessionId.empty()))
+                    openInClaudeDesktop(*it);
+            }
+            ImGui::EndPopup();
+        }
+
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !ImGui::IsAnyItemHovered()) ImGui::OpenPopup("menu");
         if (ImGui::BeginPopup("menu")) {
             if (ImGui::MenuItem("Always on top", nullptr, &onTop)) glfwSetWindowAttrib(win, GLFW_FLOATING, onTop);
             if (ImGui::MenuItem("Quit")) glfwSetWindowShouldClose(win, GLFW_TRUE);

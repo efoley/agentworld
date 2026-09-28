@@ -38,8 +38,9 @@ target_link_libraries(imgui PUBLIC glfw)
 
 find_package(OpenGL REQUIRED)
 
-add_executable(agentworld MACOSX_BUNDLE src/main.cpp src/status.cpp src/frog.cpp)
+add_executable(agentworld MACOSX_BUNDLE src/main.cpp src/status.cpp src/frog.cpp src/focus.cpp)
 set_target_properties(agentworld PROPERTIES
   MACOSX_BUNDLE_BUNDLE_NAME agentworld
-  MACOSX_BUNDLE_GUI_IDENTIFIER dev.ericfoley.agentworld)
+  MACOSX_BUNDLE_GUI_IDENTIFIER dev.ericfoley.agentworld
+  MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist.in)
 target_link_libraries(agentworld PRIVATE imgui nlohmann_json::nlohmann_json OpenGL::GL)

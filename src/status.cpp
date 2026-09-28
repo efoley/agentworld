@@ -170,6 +170,9 @@ std::vector<Agent> readAgents(const std::string& root) {
         Agent a;
         a.name = s.value("name", "");
         a.status = s.value("status", "");
+        a.cwd = cwd;
+        a.pid = s.value("pid", 0);
+        a.bridgeSessionId = s.value("bridgeSessionId", "");
         int64_t updated = s.value("updatedAt", int64_t{0});
 
         if (a.status == "busy" || a.status == "shell") {

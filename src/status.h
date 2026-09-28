@@ -9,6 +9,9 @@ struct Agent {
     std::string status;   // raw status from the session registry
     AgentState state = AgentState::Idle;
     std::string detail;   // the pending question or last message, for the tooltip
+    std::string cwd;
+    int pid = 0;          // the claude process
+    std::string bridgeSessionId;  // "session_…" when Remote Control is on
 };
 
 // Reads ~/.claude/sessions for live, user-named sessions whose cwd is under
